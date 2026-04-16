@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { filterSlice } from '../../features/filter';
 import { Status } from '../../types/Status';
@@ -8,14 +8,20 @@ export const TodoFilter: React.FC = () => {
   const { query, status } = useAppSelector(state => state.filter);
   const dispatch = useAppDispatch();
 
-  const [tempQuery, setTempQuery] = useState('');
+  const [tempQuery, setTempQuery] = useState(query);
   const setResidualQuery = useCallback(
     debounce(
       currentQuery => dispatch(filterSlice.actions.setQuery(currentQuery)),
       400,
     ),
-    [],
+    [dispatch],
   );
+
+  useEffect(() => {
+    return () => {
+      setResidualQuery.cancel();
+    };
+  }, []);
 
   return (
     <form className="field has-addons">
@@ -61,7 +67,7 @@ export const TodoFilter: React.FC = () => {
               type="button"
               className="delete"
               onClick={() => {
-                dispatch(filterSlice.actions.reset());
+                dispatch(filterSlice.actions.setQuery(''));
                 setTempQuery('');
               }}
             />

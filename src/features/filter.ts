@@ -23,6 +23,5 @@ export const filterSlice = createSlice({
       ...state,
       status: action.payload,
     }),
-    reset: () => initialState,
   },
 });
