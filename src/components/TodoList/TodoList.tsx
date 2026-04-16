@@ -4,43 +4,32 @@ import { TodoModal } from '../TodoModal/TodoModal';
 import classNames from 'classnames';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { currentTodoSlice } from '../../features/currentTodo';
-import { Loader } from '../Loader/Loader';
-import { getTodos } from '../../api';
-import { todosSlice } from '../../features/todos';
+import { Todo } from '../../types/Todo';
 
 export const TodoList: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { todos, currentTodo, filter }  = useAppSelector(state => state);
-  const [loading, setLoading] = useState(false);
+  const { todos, currentTodo, filter } = useAppSelector(state => state);
+  const [preparedTodos, setPreparedTodos] = useState <Todo[]>([]);
 
   useEffect(() => {
-    setLoading(true);
+    let filteredTodos = filter.status === 'completed'
+      ? todos.filter(item => item.completed)
+      : filter.status === 'active'
+        ? todos.filter(item => !item.completed)
+        : [...todos];
 
-    getTodos()
-      .then( todoList =>
-        dispatch(
-          todosSlice.actions.setTodos(
-            (filter.status === 'completed'
-              ? todoList.filter(item => item.completed)
-              : filter.status === 'active'
-                ? todoList.filter(item => !item.completed)
-                : [...todoList]
-            ).filter(item =>
-              item.title.toLowerCase().includes(filter.query.toLowerCase()),
-            ),
-          ),
-        )
-      )
-      .finally(() => setLoading(false));
+    if (filter.query) {
+      filteredTodos = filteredTodos.filter(item =>
+               item.title.toLowerCase().includes(filter.query.toLowerCase()),
+             )
+    }
+
+    setPreparedTodos(filteredTodos);
   }, [filter]);
-
-
 
   return (
     <>
-      {loading
-        ? <Loader />
-        : todos.length <= 0
+      { preparedTodos.length <= 0
           ? <p className="notification is-warning">
               There are no todos matching current filter criteria
             </p>
@@ -59,7 +48,7 @@ export const TodoList: React.FC = () => {
           </thead>
 
           <tbody>
-            {todos.map(todo => (
+            {preparedTodos.map((todo: Todo) => (
               <tr
                 data-cy="todo"
                 className={classNames({
