@@ -25,7 +25,7 @@ export const TodoList: React.FC = () => {
     }
 
     setPreparedTodos(filteredTodos);
-  }, [filter]);
+  }, [todos, filter]);
 
   return (
     <>

@@ -21,7 +21,7 @@ export const TodoFilter: React.FC = () => {
     return () => {
       setResidualQuery.cancel();
     };
-  }, []);
+  }, [setResidualQuery]);
 
   return (
     <form className="field has-addons">

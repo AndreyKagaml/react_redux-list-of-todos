@@ -16,7 +16,7 @@ export const App = () => {
     getTodos()
       .then(todoList => dispatch(todosSlice.actions.setTodos(todoList)))
       .finally(() => setLoading(false));
-  }, []);
+  }, [dispatch]);
 
   return (
     <>
